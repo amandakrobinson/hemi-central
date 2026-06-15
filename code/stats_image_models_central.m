@@ -1,9 +1,7 @@
 function stats_image_models_central()
 
-% run RSA: correlate visual statistics RDMs with neural RDMs from left and right hemispheres
-% partial out one hemisphere RDM data from other hemisphere data, then run linear models on
-% the residuals - tells us what information is contained in the left versus
-% right hemisphere
+% run RSA: correlate visual statistics RDMs with neural RDMs from left and
+% right hemispheres (separately) while partialling out the other hemisphere
 
 doonsets=1;
 
@@ -34,7 +32,7 @@ clear s
 for p = 1:20
     fprintf('Computing RSA for participant %d\n',p)
 
-    %% partial out one hemisphere from another, then regress with image models
+    %% partial correlations between each hemisphere and image models, controlling for other hemi
 
     % left hemisphere
     x1 = alldat.(clust{1})(:,:,p);
@@ -67,7 +65,7 @@ for p = 1:20
         s.partialceil_upperR(t,:,p) = partialcorr(x2(:,t),high_rh(:,t),x1(:,t),'type','Spearman');
     end
 end
-
+%%
 dat = s;
 fprintf('Saving\n')
 save('results/stats_imagecorrs.mat','dat','timevect','mods','modelnames', '-v7.3');

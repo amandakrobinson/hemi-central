@@ -89,6 +89,17 @@ set(gca,'XTickLabels',[stimorder stimorder])
 set(gca,'XTickLabelRotation',90)
 set(gca,'YTick',[])
 
+% add colourbar without resizing plot
+ax = gca;
+orig_pos = ax.Position;
+cb = colorbar('southoutside');
+% cb.Position = cb.Position + 1e-10;
+cb.Position(2) = .02;
+cb.Ticks = cb.Limits;               % Set specific tick locations
+cb.TickLabels = {'Similar', 'Dissimilar'}; % Change text for those ticks
+ax.Position = orig_pos;
+
+
 % correlations between
 mask = ones(size(m_cielab));
 mask = tril(mask,-1);
@@ -155,7 +166,7 @@ xlabel('Dimension 1')
 ylabel('Dimension 2')
 title('Model relationships','FontSize',20)
 
-% save
+%% save
 fn = './figures/Figure2_models';
 
 % export PNG
@@ -167,6 +178,13 @@ imwrite(im(min(i)-margin:max(i)+margin, min(j)-margin:max(j)+margin, :), [fn '.p
 
 %% correlations between models
 
-[r,p] = corr(mods,'type','spearman')
+% in order of 'labels'
+[r,p] = corr(mods,'type','spearman');
+models = {'Edge' 'Colour',...
+    'Mean luminance','Low spatial frequency', ...
+    'High spatial frequency','Rectilinearity',...
+    'Concept','Image/Word'};
 
 
+tablecorrs = array2table(round(r,2),'VariableNames',validlabels','RowNames',models');
+tablepvals = array2table(p,'VariableNames',validlabels','RowNames',models');

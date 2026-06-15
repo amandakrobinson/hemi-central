@@ -2,9 +2,8 @@ function stats_image_models_objectsonly()
 
 % run RSA: correlate visual statistics RDMs with neural RDMs from left and right hemispheres
 % objects only
-% partial out one hemisphere RDM data from other hemisphere data, then run linear models on
-% the residuals - tells us what information is contained in the left versus
-% right hemisphere
+% partial correlations: one hemi with visual stats, accounting for other
+% hemi
 
 if isempty(which('cosmo_wtf'))
     addpath('~/Dropbox/MATLAB/CoSMoMVPA/mvpa')
@@ -49,7 +48,7 @@ for p = 1:size(alldat.L_elecs,3)
     for o = 1:length(objconds)
         fprintf('Computing RSA for participant %d\n',p)
 
-        %% partial out one hemisphere from another, then regress with image models
+    %% partial correlations LH ~ visual models | RH (and reverse)
 
         % left hemisphere
         x1 = alldat.(clust{1})(:,:,p);
