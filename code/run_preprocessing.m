@@ -5,7 +5,7 @@ function run_preprocessing(partid)
     % average rereference
     % high pass 0.1hz
     % low pass 100hz
-    % epoch -200 to 800ms for each image
+    % epoch -100 to 800ms for each image
     % perform CSD/laplacian transformation on data
     % convert data to cosmomvpa format
     
