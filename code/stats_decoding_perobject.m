@@ -12,7 +12,7 @@ end
 fprintf('Loading data\n')
 
 % get files
-fileList = dir('results/sub-*_decoding.mat');
+fileList = dir('results/sub-*_decoding_equal.mat');
 nofiles = dir('results/sub-*_half_decoding.mat'); % don't include split half decoding files
 filenames = {fileList.name};
 idx = ismember(filenames,{nofiles.name});
@@ -78,7 +78,7 @@ combos = {'Face' 'Word' 'Object' 'FaceObject' 'FaceWord' 'WordObject'};
 % average across all pairs
 x=0;
 reso=struct();
-for p = 1:20
+for p = 1:length(files)
     for cl = 1:2
         for cn = 1:6
             x=x+1;

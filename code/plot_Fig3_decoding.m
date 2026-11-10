@@ -23,7 +23,6 @@ bflabels = {'Left hemisphere' 'Right hemisphere'};
 
 % initialise figure
 fig=figure(1);clf;
-% fig.Position=[1 1 1400 1800];
 fig.Units = 'pixels';
 fig.Position=[1 1 1500 900];
 fig.Resize = 'off';
@@ -143,8 +142,6 @@ xlabel('Time (ms)')
 sp.XTick = -100:100:800;    
 set(sp,'FontSize',18);
 
-% set(gca,'YTickLabel',sp.YTickLabel,'FontSize',16)
-% set(gca,'YTickLabelMode','auto')
 sp.YAxis.FontSize = 16;
 xlim([min(timevect) max(timevect)+1])
 

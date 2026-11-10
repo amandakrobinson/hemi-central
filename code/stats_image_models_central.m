@@ -76,8 +76,7 @@ stats = struct();
 stats.timevect = timevect;
 stats.clust = clust;
 
-contrast = fieldnames(dat);
-contrast = contrast(3:4); 
+contrast = {'partialcorr_L', 'partialcorr_r'};
 
 combs = nchoosek(1:20,20-2); %leave-2-participants-out for jackknifing
 
@@ -136,11 +135,11 @@ for c = 1:length(contrast)
             if isempty(onset_jack)
                 s.onsetci=[];
             else
-                ci = prctile(onset_jack,[5 95]);
+                ci = prctile(onset_jack,[2.5 97.5]);
                 s.onsetci = stats.timevect([floor(ci(1)) ceil(ci(2))]);
             end
             s.peakjk = stats.timevect(peak_jack);
-            s.peakci = stats.timevect(round(prctile(peak_jack,[5 95])));
+            s.peakci = stats.timevect(round(prctile(peak_jack,[2.5 97.5])));
         end
 
         stats.(contrast{c}).(modelnames{m}) = s;

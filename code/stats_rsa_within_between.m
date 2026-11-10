@@ -19,7 +19,7 @@ res_cell={};
 cc = clock();mm='';
 for f=1:length(files)
     fn = sprintf('results/%s',files(f).name);
-    load(fn,'res');
+    load(fn,'res');    
     res_cell{f} = res;
     mm = cosmo_show_progress(cc,f/length(files),sprintf('%i/%i',f,length(files)),mm);
 end

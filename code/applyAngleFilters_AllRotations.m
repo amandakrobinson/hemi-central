@@ -41,7 +41,7 @@ for rot = 1:nRotations
     alpha = rotationList(rot);
     
     % Generate angle (V-shaped) filter
-    [angleKernel, ~] = AngleFilter_simplified2(SF, alpha, angle, filterSize);
+    [angleKernel, ~] = AngleFilter_simplified(SF, alpha, angle, filterSize);
     angleFilt = real(angleKernel);
     
     % Apply angle filter

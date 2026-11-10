@@ -20,7 +20,7 @@ rng(7302)
 f=figure(1);clf;
 f.Position = [f.Position(1:2) 950 800];
 
-meanrdm = alldat.(clust{1})+alldat.(clust{2})/2;
+meanrdm = (alldat.(clust{1})+alldat.(clust{2}))/2;
 meanrdm = mean(mean(meanrdm(:,timetoplot,:),2),3);
 Xstart = mdscale(squareform(meanrdm),2,'Start','random','Replicates',50);
 
@@ -34,7 +34,6 @@ for h = 1:length(clust)
     a.YDir='normal';
     colorbar
     colormap viridis
-%     axis off
     set(a,'Fontsize',18)
     set(gca,'YTick',medcat)
     set(gca,'YTickLabels',[stimorder stimorder])
@@ -63,7 +62,7 @@ for h = 1:length(clust)
     hold on
     X=X1;
     aw=range(X(:))*.06;
-    imrange = 1:768;
+    imrange = 1:128;
     plot(X(:,1),X(:,2),'.')
     for i=1:length(imnames)
         imname = dir(sprintf('stimuli_rendered/stim%03i*',i));
@@ -75,8 +74,8 @@ for h = 1:length(clust)
         
         image('XData',X(i,1)+aw*[-1 1],'YData',X(i,2)+aw*[-1 1],'CData',IM(imrange,imrange,1:3))
     end
-    xlabel('Dimension 2')
-    ylabel('Dimension 1')
+    xlabel('Dimension 1')
+    ylabel('Dimension 2')
     axis equal
     % axis square
 

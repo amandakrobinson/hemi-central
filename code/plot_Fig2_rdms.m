@@ -3,6 +3,10 @@
 load('results/RSAmodels.mat','m_cielab','m_sflow','m_sfhigh','m_rect','m_lum', ...
     'm_cat','m_imw','m_edge');
 
+mask = ones(size(m_cielab));
+mask = tril(mask,-1);
+
+%% plot
 figure(1);clf;
 set(gcf,'Position',[1 1 1050 1050],'Resize','off')
 cm = viridis;
@@ -15,7 +19,8 @@ stimorder = {'fish','bird','face','boats','tree','tools'};
 fs = 14;
 
 subplot(3,3,1);
-imagesc(m_edge,[0.9 1]);
+v = m_edge(mask==1); 
+imagesc(m_edge,prctile(v,[1 99]));
 axis square
 set(gca,'FontSize',fs)
 set(gca,'YDir','normal');
@@ -59,7 +64,8 @@ axis off
 title('High spatial frequency','Color',cmap(5,:),'FontSize',20)
 
 subplot(3,3,6)
-imagesc(m_rect,[0 3])
+v = m_rect(mask==1); 
+imagesc(m_rect,prctile(v,[1 99]));
 set(gca,'YDir','normal');
 axis square
 set(gca,'FontSize',fs)
@@ -95,14 +101,13 @@ orig_pos = ax.Position;
 cb = colorbar('southoutside');
 % cb.Position = cb.Position + 1e-10;
 cb.Position(2) = .02;
+cb.Position(3) = cb.Position(3)+.005;
 cb.Ticks = cb.Limits;               % Set specific tick locations
 cb.TickLabels = {'Similar', 'Dissimilar'}; % Change text for those ticks
 ax.Position = orig_pos;
 
 
-% correlations between
-mask = ones(size(m_cielab));
-mask = tril(mask,-1);
+%% correlations between
 
 mods = [m_edge(mask==1) m_cielab(mask==1) m_lum(mask==1) m_sflow(mask==1) m_sfhigh(mask==1) m_rect(mask==1) ...
     m_cat(mask==1) m_imw(mask==1)];
@@ -111,11 +116,16 @@ labels = {'Edge' 'Colour',...
     'High spatial frequency','Rectilinearity',...
     'Concept','Image/Word'};
 
+[r, p] = corr(mods, 'type', 'spearman');
+disp(array2table(r, 'VariableNames', matlab.lang.makeValidName(labels(1:8)), 'RowNames', labels(1:8)))
+disp(array2table(p, 'VariableNames', matlab.lang.makeValidName(labels(1:8)), 'RowNames', labels(1:8)))
+
+
 dists = 1-corr(mods,'type','spearman');
 
 a=mdscale(dists,2,'Criterion','metricstress');
 
-% labels for left plots
+%% labels for left plots
 for np = 1:3
     yadjust = (np-1)*.3;
     annotation(gcf,'textarrow',...
@@ -150,7 +160,7 @@ sp=subplot(3,3,9); hold on;
 set(gca,'FontSize',18)
 
 xs = [.05 0 0 0 0 -.05 0 0];
-ys = [0 -.08 -.08 -.12 -.12 .08 -.08 -.08];
+ys = [0 -.08 .08 .12 -.12 .08 -.08 .08];
 align = {'left' 'center' 'center' 'center' 'center' 'left' 'center' 'center'};
 labels{4} = {'Low spatial','frequency'};
 labels{5} = {'High spatial','frequency'};
@@ -158,7 +168,7 @@ for l = 1:length(labels)
     scatter(a(l,1),a(l,2),50,cmap(l,:),'filled')
     text(a(l,1)+xs(l),a(l,2)+ys(l),labels{l},'HorizontalAlignment',align{l},'FontSize',12)
 end
-xlim([-.7 1]);
+xlim([-.75 1]);
 ylim([-.6 .8]);
 sp.XTick = [];
 sp.YTick = [];
@@ -173,18 +183,6 @@ fn = './figures/Figure2_models';
 set(gcf, 'Renderer', 'painters')
 print(gcf, '-dpng', '-r500', fn)
 im = imread([fn '.png']);
-[i,j] = find(mean(im,3) < 255); margin = 2;
+[i,j] = find(mean(im,3) < 255); margin = 0;
 imwrite(im(min(i)-margin:max(i)+margin, min(j)-margin:max(j)+margin, :), [fn '.png'], 'png')
 
-%% correlations between models
-
-% in order of 'labels'
-[r,p] = corr(mods,'type','spearman');
-models = {'Edge' 'Colour',...
-    'Mean luminance','Low spatial frequency', ...
-    'High spatial frequency','Rectilinearity',...
-    'Concept','Image/Word'};
-
-
-tablecorrs = array2table(round(r,2),'VariableNames',validlabels','RowNames',models');
-tablepvals = array2table(p,'VariableNames',validlabels','RowNames',models');

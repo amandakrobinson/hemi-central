@@ -30,13 +30,13 @@ figure(3); clf;
 set(gcf, 'Position', [1625 -43 1800 1000]);
 
 filterSize = 300;
-alphaA = 0;%3*pi/2;
+alphaA = 0;
 
 for s = 1:nSF
     SF = SFlist(s);
     for a = 1:nAngles
         angle = angleList(a);
-        [angleK, ~] = AngleFilter_simplified2(SF, alphaA, angle, filterSize);
+        [angleK, ~] = AngleFilter_simplified(SF, alphaA, angle, filterSize);
         subplot(nSF, nAngles, (s-1)*nAngles + a);
         imagesc(real(angleK));
         axis image; axis off;
@@ -57,6 +57,7 @@ for pic = 1:nPics
         im = repmat(im, 1, 1, 3);
     end
     Img = rgb2gray(im2double(im));
+    Img = imresize(Img, 6, 'bicubic');    % 768 px: same geometry, no new detail
     
     for s = 1:nSF
         SF = SFlist(s);
@@ -121,5 +122,5 @@ end
 saveas(gcf, 'figures/image_rectilinearity.png');
 
 %% Save data
-save('imagerect.mat', 'normData', 'outputMatrix', 'finalData', ...
+save('results/imagerect.mat', 'normData', 'outputMatrix', 'finalData', ...
      'SFlist', 'angleList', 'angleLabels', 'ims');

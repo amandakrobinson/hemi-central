@@ -5,6 +5,9 @@ function run_half_decoding(subjectnr)
 % decoding is performed separately on odd and even trial sequences,
 % for later comparison across hemispheres without using the same trials
 
+% set randomiser
+rng(subjectnr);
+
 %% cosmomvpa
 if ismac
     addpath('~/Dropbox (Personal)/MATLAB/CoSMoMVPA/mvpa')
@@ -37,7 +40,7 @@ cosmo_warning('off')
 %% data details
 fprintf('loading data...\n')
 
-fn = sprintf('data/derivatives/cosmomvpa/sub-%02i_task-rsvp_cosmomvpa_CSD.mat',subjectnr);
+fn = sprintf('../hemifield-eeg/data/derivatives/cosmomvpa/sub-%02i_task-rsvp_cosmomvpa_CSD.mat',subjectnr);
 outfn = sprintf('results/sub-%02i_half_decoding.mat',subjectnr);
 fprintf('loading %s\n',fn);tic
 load(fn,'ds')
@@ -59,6 +62,26 @@ for i = 1:length(nims)
     imnames(i) = n(1);
 end
 
+% make sure only 4 stims per sequence to equalise for decoding
+seq = unique(ds.sa.sequencenumber);
+ds.sa.invalid = zeros(size(ds.sa.sequencenumber));
+for s=1:length(seq)
+    idx = find(ds.sa.stimC>-1&ds.sa.sequencenumber==seq(s));
+    for st=[0:23 24:2:46]
+        stimx = idx(ds.sa.stimC(idx)==st);
+        if numel(stimx) > 4
+            drop = stimx(randperm(numel(stimx), numel(stimx)-4));
+            ds.sa.invalid(drop) = 1;
+        end
+    end
+end
+
+v = ds.sa.condition==1 & ds.sa.invalid==0 & ds.sa.stimC>-1;
+[~,~,c] = unique(ds.sa.stimC(v));
+counts = accumarray(c,1);
+assert(all(counts==48), 'Unequal trial counts: %s', mat2str(counts'))
+
+
 %% factors
 condnames = {'Central' 'Peripheral' 'MultiplePeripheral'};
 vfs = {'LVF' 'RVF'};
@@ -72,20 +95,19 @@ ma={};
 ma.classifier = @cosmo_classify_lda;
 ma.nproc = nproc;
 ma.progress=0;
-ma.normalization='demean';
 ma.output = 'accuracy';
 
 %% decode
 res_cell={};
 
 %% for each presentation condition
-for cond = 1:length(condnames) % central, peripheral, multiple peripheral
+for cond = 1% central
     
     %% pairwise decoding for 24 images and 24 words
     % order of images is 1-12 animate (fishx4,birdx4,facex4), 13-24 inanimate
     % (boats, tree, tools), 25-36 words (fish, bird, face, boats, tree, tools)
     
-    dsb = cosmo_slice(ds,ds.sa.condition==cond); % central objs
+    dsb = cosmo_slice(ds,ds.sa.condition==cond&ds.sa.invalid==0); % central objs
 
     %% for each visual field
     for lrvf=1:length(vfs) % LVF then RVF
@@ -132,7 +154,7 @@ for cond = 1:length(condnames) % central, peripheral, multiple peripheral
                     ds_prop = cosmo_slice(dsbe,ismember(dsbe.sa.targets,condcomb(t,:)));
                     
                     partitions = cosmo_nchoosek_partitioner(ds_prop,1);
-                    partitions = cosmo_balance_partitions(partitions,ds_prop,'balance_test',false);
+                    partitions = cosmo_balance_partitions(partitions,ds_prop);
                     
                     ma.partitions=partitions;
                     

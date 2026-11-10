@@ -46,11 +46,16 @@ for i = 1:length(imnames)
 
     %% spatial frequency
 
-    % images are 768 x 768 and presented at 3.24 dova
-    % Pixels per degree: 768 / 3.24 = 237.04 pixels/degree
-    % Nyquist frequency: 237.04 / 2 = 118.52 cycles/degree
-    % Radial profile length: 545 points (half diagonal of 768 x 768)
-    % Frequency per index: 118.52 / 545 = 0.2175 cycles/degree per index
+    % calculate radial SF - direction invariant
+    % images were 128 x 128 and presented at 3.24 dova
+    % display pixels per degree: 128 / 3.24 = 39.5 pixels/degree
+    % display Nyquist frequency: 39.5 / 2 = 19.75 cycles/degree (64 cycles per image)
+    % frequency per index: 19.75/64 = 0.309 cycles/degree
+
+    % radial bins: index k contains radii (k-2, k-1] cycles/image; index 1 = DC
+    % Low SF  (<3 cpd):        indices 2:10  = 0.31-2.78 cpd
+    % High SF (6 cpd-Nyquist): indices 22:65 = 6.17-19.75 cpd
+
 
     % Mean-subtract image before FFT to remove DC component
     % This ensures low SF captures contrast energy at low frequencies
@@ -74,7 +79,7 @@ for i = 1:length(imnames)
     count = zeros(maxRadius, 1);
     for col = 1 : columns
         for row = 1 : rows
-            radius = sqrt((row - midRow) ^ 2 + (col - midCol) ^ 2);
+            radius = sqrt((row - midRow) ^ 2 + (col - midCol) ^ 2); % how far is this pixel from the centre
             thisIndex = ceil(radius) + 1;
             radialProfile(thisIndex) = radialProfile(thisIndex) + shiftedFFTMagnitude(row, col);
             count(thisIndex) = count(thisIndex) + 1;
@@ -85,12 +90,12 @@ for i = 1:length(imnames)
     radialProfile = radialProfile ./ count;
     
     % Low SF (0-3 cpd): start from index 2 to skip DC component
-    % Index range: 2 to round(3 / 0.2175) = 2 to 14
-    sflow(i,:) = radialProfile(2:14);
+    % Index range: 2 to floor(3 / 0.309)+1 = 2 to 10
+    sflow(i,:) = radialProfile(2:10);
 
     % High SF (6+ cpd):
-    % Index range: round(6 / 0.2175) onwards = 28 to 545
-    sfhigh(i,:) = radialProfile(28:end-1);
+    % Index range: ceil(6 / 0.309)+2 to ceil(19.75/0.309)+1 = 22 to 65
+    sfhigh(i,:) = radialProfile(22:65);
 
 end
 

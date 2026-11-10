@@ -90,7 +90,7 @@ for a = 1:length(modelnames)
     ylim(10.^(5*[-1 1]))
     sp.YTick = 10.^([-5 0 5]);
     sp.XTick = 0:200:800;
-    % sp.XTickLabel = [];
+    drawnow
     xlim([min(timevect) max(timevect)+1])
     ylabel('BF_d_i_f_f')
     xlabel('Time (ms)')
@@ -100,8 +100,8 @@ end
 %%
 for a= 1:length(modelnames)
     sp=subplot(6,3,6+spl(a));
-    sp.Position(2) = sp.Position(2)+.03;
-    % sp.Position(4) = sp.Position(4)-.04;
+    sp.Position(4) = sp.Position(4)-.01;
+    sp.Position(2)=sp.Position(2)+.04;
 end
 
 %% save

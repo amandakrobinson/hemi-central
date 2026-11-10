@@ -46,7 +46,11 @@ for h = 1:length(contrast)
         rsainfo.Hemisphere{x,1} = heminames{h};
         rsainfo.Feature{x,1} = modelnames{m};
         rsainfo.Onset(x,1) = s.onset;
+        rsainfo.Onset_lowCI(x,1) = s.onsetci(1);
+        rsainfo.Onset_highCI(x,1) = s.onsetci(2);
         rsainfo.Peak(x,1) = s.peak;
+        rsainfo.Peak_lowCI(x,1) = s.peakci(1);
+        rsainfo.Peak_highCI(x,1) = s.peakci(2);
         rsainfo.PeakCorr(x,1) = max(s.mu);
 
     end

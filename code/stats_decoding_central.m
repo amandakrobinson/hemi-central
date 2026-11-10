@@ -11,7 +11,7 @@ end
 fprintf('Loading data\n')
 
 % get files
-fileList = dir('results/sub-*_decoding.mat');
+fileList = dir('results/sub-*_decoding_equal.mat');
 nofiles = dir('results/sub-*_half_decoding.mat'); % don't include split half decoding files
 filenames = {fileList.name};
 idx = ismember(filenames,{nofiles.name});
@@ -110,11 +110,11 @@ for cl = 1:length(clust)
         if isempty(onset_jack)
             s.onsetci=[];
         else
-            ci = prctile(onset_jack,[5 95]);
+            ci = prctile(onset_jack,[2.5 97.5]);
             s.onsetci = stats.timevect([floor(ci(1)) ceil(ci(2))]);
         end
         s.peakjk = stats.timevect(peak_jack);
-        s.peakci = stats.timevect(round(prctile(peak_jack,[5 95])));
+        s.peakci = stats.timevect(round(prctile(peak_jack,[2.5 97.5])));
 
         stats.(clust{cl}) = s;
         fprintf('Onsets done\n')
@@ -171,11 +171,11 @@ if doonsets == 1
     if isempty(onset_jack)
         s.onsetci=[];
     else
-        conf = prctile(onset_jack,[5 95]);
+        conf = prctile(onset_jack,[2.5 97.5]);
         s.onsetci = stats.timevect([floor(conf(1)) ceil(conf(2))]);
     end
     s.peakjk = stats.timevect(peak_jack);
-    s.peakci = stats.timevect(round(prctile(peak_jack,[5 95])));
+    s.peakci = stats.timevect(round(prctile(peak_jack,[2.5 97.5])));
 
     fprintf('Onsets done\n')
 end
